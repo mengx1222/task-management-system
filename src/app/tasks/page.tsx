@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -37,7 +37,7 @@ interface TaskType {
   task_type: string;
 }
 
-export default function TasksPage() {
+function TasksContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -257,5 +257,37 @@ export default function TasksPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function TasksLoading() {
+  return (
+    <div className="container py-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <Skeleton className="h-9 w-32 mb-2" />
+          <Skeleton className="h-5 w-64" />
+        </div>
+        <Skeleton className="h-10 w-28" />
+      </div>
+      <div className="flex gap-4 mb-6">
+        <Skeleton className="h-10 w-48" />
+        <Skeleton className="h-10 w-40" />
+        <Skeleton className="h-10 flex-1 max-w-md" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <Skeleton key={i} className="h-48" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function TasksPage() {
+  return (
+    <Suspense fallback={<TasksLoading />}>
+      <TasksContent />
+    </Suspense>
   );
 }

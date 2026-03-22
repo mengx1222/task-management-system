@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -55,7 +55,7 @@ interface User {
   userGroup: string;
 }
 
-export default function TaskDetailPage({ params }: { params: Promise<{ id: string }> }) {
+function TaskDetailContent({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -328,5 +328,30 @@ export default function TaskDetailPage({ params }: { params: Promise<{ id: strin
         </div>
       </div>
     </div>
+  );
+}
+
+function TaskDetailLoading() {
+  return (
+    <div className="container py-8">
+      <Skeleton className="h-8 w-32 mb-6" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Skeleton className="h-64 w-full" />
+        </div>
+        <div className="space-y-6">
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function TaskDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  return (
+    <Suspense fallback={<TaskDetailLoading />}>
+      <TaskDetailContent params={params} />
+    </Suspense>
   );
 }
